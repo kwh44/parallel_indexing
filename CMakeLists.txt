@@ -8,7 +8,7 @@ find_package(Boost COMPONENTS system REQUIRED)
 
 find_package(Threads REQUIRED)
 
-add_compile_options("-DDEBUG")
+# add_compile_options("-DDEBUG")
 
 add_executable(main main.cpp read_config.hpp read_config.cpp measure_time.hpp)
 
