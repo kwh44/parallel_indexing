@@ -1,24 +1,37 @@
 #include <iostream>
-
-/*
-  read config file from command line:
-    if config file given then read it else search for config.dat in pwd.
-    - read input filename, output filenames, number of threads to utilize;
-      input data
-        -- input file format: .txt, .zip with .txt files, .tar, gz, tar.gz
-        -- character encoding utf-8, en_us locale
-  process:
-    count how many time each word in file/s was used;
-     -- count without delimiters on each side, delimiters inside a word is allowed;
-     -- uppercase = lowercase; ignore the register;
-    exception handling;
-     --
-    -
-  output result to two files
-  */
-
+#include "read_config.hpp"
+#include "measure_time.hpp"
 
 int main(int argc, char **argv) {
+    // help info
+    if (argc == 2 && std::string(argv[1]) == "--help") {
+        std::cout << "Description\n" <<
+                  "$ main path_to_config_file\n";
+        return 0;
+    }
+    std::string filename("config.dat");
+    // user's config file
+    if (argc == 2) {
+        filename = argv[1];
+    }
+    std::ifstream config_stream(filename);
+    if (!config_stream.is_open()) {
+        std::cerr << "Failed to open configuration file " << filename << std::endl;
+        return 1;
+    }
+    config_data_t conf_data;
+    try {
+        read_config_data(config_stream, conf_data);
+    } catch (std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        return 2;
+    }
 
-  return 0;
+#ifdef DEBUG
+    std::cout << "Input filename " << conf_data.input_file_name << "." << std::endl;
+    std::cout << "Output alphabet order filename " << conf_data.output_alphabet_order << "." << std::endl;
+    std::cout << "Output count order filename " << conf_data.output_count_order << "." << std::endl;
+    std::cout << "Thread num to utilize " << conf_data.thread_num << "." << std::endl;
+#endif
+    return 0;
 }

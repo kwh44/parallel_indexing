@@ -8,6 +8,8 @@ find_package(Boost COMPONENTS system REQUIRED)
 
 find_package(Threads REQUIRED)
 
-add_executable(main main.cpp)
+add_compile_options("-DDEBUG")
 
-target_link_libraries(main Boost::system Threads::threads)
+add_executable(main main.cpp read_config.hpp read_config.cpp measure_time.hpp)
+
+target_link_libraries(main Boost::system Threads::Threads)

@@ -1,4 +1,4 @@
-test_data/input.txt       # input file_name
-alphabet_order.txt        # output file_name for alphabetic ordering
-count_order.txt           # output file_name for count ordering
-8                         # number of threads to utilize
+test_data/input.txt
+alphabet_order.txt
+count_order.txt
+8
