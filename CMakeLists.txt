@@ -10,6 +10,8 @@ find_package(Threads REQUIRED)
 
 # add_compile_options("-DDEBUG")
 
-add_executable(main main.cpp read_config.hpp read_config.cpp measure_time.hpp)
+add_subdirectory(libarchive_read_compressed_files_content)
+add_subdirectory(boost_locale)
+add_executable(parallel_indexing main.cpp read_config.hpp read_config.cpp measure_time.hpp)
 
-target_link_libraries(main Boost::system Threads::Threads)
+target_link_libraries(parallel_indexing Boost::system Threads::Threads)
