@@ -36,12 +36,12 @@ void get_file_content(std::vector<std::string> &storage_container, std::string &
             // relative path to the file in the archive
             // std::cout << archive_entry_pathname(entry) << std::endl;
             if (archive_entry_size(entry) > 0) {
+                len = archive_read_data(a, buff, sizeof(buff));
                 while (len > 0) {
-                    len = archive_read_data(a, buff, sizeof(buff));
                     storage_container.emplace_back(boost::locale::fold_case(boost::locale::normalize(std::string(buff))));
+                    len = archive_read_data(a, buff, sizeof(buff));
                 }
             }
-            std::cout << std::endl;
         }
         archive_read_close(a);
         archive_read_free(a);
