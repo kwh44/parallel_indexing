@@ -1,6 +1,7 @@
 #include <iostream>
 #include "read_config.hpp"
 #include "measure_time.hpp"
+#include "read_from_file.hpp"
 
 int main(int argc, char **argv) {
     // help info
@@ -12,7 +13,7 @@ int main(int argc, char **argv) {
     std::string filename("config.dat");
     // user's config file
     if (argc == 2) {
-        filename = argv[1];
+        filename = std::string(argv[1]);
     }
     std::ifstream config_stream(filename);
     if (!config_stream.is_open()) {
@@ -33,5 +34,10 @@ int main(int argc, char **argv) {
     std::cout << "Output count order filename " << conf_data.output_count_order << "." << std::endl;
     std::cout << "Thread num to utilize " << conf_data.thread_num << "." << std::endl;
 #endif
+    std::vector<std::string> file_data;
+    get_file_content(file_data, conf_data.input_file_name);
+    for (const auto& v: file_data) {
+        std::cout << v << std::endl;
+    }
     return 0;
 }
