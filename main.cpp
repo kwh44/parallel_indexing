@@ -7,7 +7,7 @@ int main(int argc, char **argv) {
     // help info
     if (argc == 2 && std::string(argv[1]) == "--help") {
         std::cout << "Description\n" <<
-                  "$ main path_to_config_file\n";
+                  "$ ./parallel_indexing <path_to_config_file>\n";
         return 0;
     }
     std::string filename("config.dat");

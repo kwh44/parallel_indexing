@@ -12,17 +12,15 @@ find_package(LibArchive REQUIRED)
 
 find_package(ICU COMPONENTS uc i18n REQUIRED)
 
-add_compile_options("-DDEBUG")
+# add_compile_options("-DDEBUG")
 
 set(Boost_USE_STATIC_LIBS OFF)
 
 set(Boost_USE_MULTITHREAD ON)
 
-# add_subdirectory(boost_locale)
+include_directories(include)
 
-# add_subdirectory(libarchive)
-
-add_executable(parallel_indexing main.cpp read_config.hpp read_config.cpp
-        measure_time.hpp read_from_file.cpp read_from_file.hpp)
+add_executable(parallel_indexing main.cpp include/read_config.hpp src/read_config.cpp
+        include/measure_time.hpp src/read_from_file.cpp include/read_from_file.hpp)
 
 target_link_libraries(parallel_indexing Boost::locale archive)

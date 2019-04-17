@@ -20,10 +20,11 @@ static void warn(const char *, const char *);
 void get_file_content(std::vector<std::string> &storage_container, std::string &filename) {
     boost::locale::generator gen;
     std::locale::global(gen("en_us.UTF-8"));
-    std::string format = boost::locale::fold_case(boost::locale::normalize(std::string(filename.end() - 3, filename.end())));
+    std::string format = boost::locale::fold_case(
+            boost::locale::normalize(std::string(filename.end() - 3, filename.end())));
     if (format == "zip") {
-        int response = 0;
-        ssize_t len = 1;
+        int response;
+        ssize_t len;
         char buff[10240];
         struct archive *a;
         struct archive_entry *entry;
@@ -36,9 +37,11 @@ void get_file_content(std::vector<std::string> &storage_container, std::string &
             // relative path to the file in the archive
             // std::cout << archive_entry_pathname(entry) << std::endl;
             if (archive_entry_size(entry) > 0) {
+                // len == how many chars were read
                 len = archive_read_data(a, buff, sizeof(buff));
                 while (len > 0) {
-                    storage_container.emplace_back(boost::locale::fold_case(boost::locale::normalize(std::string(buff))));
+                    storage_container.emplace_back(
+                            boost::locale::fold_case(boost::locale::normalize(std::string(buff))));
                     len = archive_read_data(a, buff, sizeof(buff));
                 }
             }
