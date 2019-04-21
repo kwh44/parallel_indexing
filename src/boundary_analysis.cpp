@@ -25,7 +25,7 @@ void parse(std::vector<std::unique_ptr<std::map<std::string, size_t>>> &list, si
 #ifdef DEBUG
     std::cout << "tls map created" << std::endl;
 #endif
-    for (size_t i = start; i < data.size(); ++i) {
+    for (size_t i = start; i < data.size(); i+= step) {
         boost::locale::boundary::ssegment_index map(boost::locale::boundary::word, data[i].begin(), data[i].end());
         map.rule(boost::locale::boundary::word_any);
         std::set<std::string> s(map.begin(), map.end());

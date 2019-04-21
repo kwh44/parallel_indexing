@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
 
     for (auto &v: list) {
         for (auto &v: *v) {
-            std::cout << v.first << " : " << v.second <<  std::endl;
+            std::cout << v.first << " : " << v.second << std::endl;
         }
     }
     return 0;
