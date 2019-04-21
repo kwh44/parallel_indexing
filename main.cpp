@@ -2,6 +2,7 @@
 #include <thread>
 #include <string>
 #include <algorithm>
+#include <vector>
 #include <map>
 #include <memory>
 #include <mutex>
@@ -10,6 +11,8 @@
 #include "measure_time.hpp"
 #include "read_from_file.hpp"
 #include "boundary_analysis.h"
+
+typedef std::pair<std::string, size_t> pair;
 
 
 int main(int argc, char **argv) {
@@ -37,15 +40,32 @@ int main(int argc, char **argv) {
         return 2;
     }
 
+    // check output files
+    std::ofstream output_alphabet(conf_data.output_alphabet_order);
+    if (!config_stream.is_open()) {
+        std::cerr << "Failed to open file for alphabet order result" << std::endl;
+        return 1;
+    }
+    std::ofstream output_count(conf_data.output_count_order);
+    if (!config_stream.is_open()) {
+        std::cerr << "Failed to open file for count order result " << std::endl;
+        return 1;
+    }
+
 #ifdef DEBUG
     std::cout << "Input filename " << conf_data.input_file_name << "." << std::endl;
     std::cout << "Output alphabet order filename " << conf_data.output_alphabet_order << "." << std::endl;
     std::cout << "Output count order filename " << conf_data.output_count_order << "." << std::endl;
     std::cout << "Thread num to utilize " << conf_data.thread_num << "." << std::endl;
 #endif
+    auto start_reading = get_current_time_fenced();
+
     std::vector<std::string> file_data;
     get_file_content(file_data, conf_data.input_file_name);
-    std::cout << "return from get_file_content\n";
+
+    auto finish_reading = get_current_time_fenced();
+
+//    std::cout << "return from get_file_content\n";
     for (const auto &v: file_data) {
         std::cout << v << std::endl;
     }
@@ -55,19 +75,65 @@ int main(int argc, char **argv) {
     std::vector<std::unique_ptr<std::map<std::string, size_t>>> list;
     std::mutex list_mtx;
 
+    auto start_counting = get_current_time_fenced();
+
     for (size_t i = 0; i < conf_data.thread_num; ++i) {
         thread_list.emplace_back(parse, std::ref(list), i, conf_data.thread_num, std::ref(file_data),
                                  std::ref(list_mtx));
     }
+
+
     std::cout << "everything created\n";
 
     for (auto &v: thread_list) v.join();
 
+    // merge maps
+    std::map<std::string, size_t> final_map;
     for (auto &v: list) {
         for (auto &v: *v) {
-            std::cout << v.first << " : " << v.second << std::endl;
+            final_map[v.first] += v.second;
         }
     }
+    auto finish_counting = get_current_time_fenced();
+
+    for (auto &v: final_map) {
+        std::cout << v.first << ": " << v.second << std::endl;
+    }
+
+    // create a empty vector of pairs
+    std::vector<pair> results_alphabet, results_count;
+
+    // copy key-value pairs from the map to the vector
+    std::copy(final_map.begin(),
+              final_map.end(),
+              std::back_inserter<std::vector<pair>>(results_alphabet));
+    copy(results_alphabet.begin(), results_alphabet.end(), back_inserter(results_count));
+
+
+    // sort the vectors
+    std::sort(results_alphabet.begin(), results_alphabet.end(),
+              [](const pair &l, const pair &r) {
+                  return l.first < r.first;
+              });
+    std::sort(results_count.begin(), results_count.end(),
+              [](const pair &l, const pair &r) {
+                  return l.second > r.second;
+              });
+
+    // write results to output files
+    for (auto &v: results_alphabet){
+        output_alphabet << v.first << ": " << v.second << std::endl;
+    }
+    for (auto &v: results_alphabet){
+        output_count << v.first << ": " << v.second << std::endl;
+    }
+
+    auto total_finish = get_current_time_fenced();
+
+    std::cout << "Total time: " << to_us(total_finish - start_reading) / 1000000.0 << std::endl;
+    std::cout << "Reading time: " << to_us(finish_reading - start_reading) / 1000000.0 << std::endl;
+    std::cout << "Counting time: " << to_us(finish_counting - start_counting) / 1000000.0 << std::endl;
+
     return 0;
 }
 
