@@ -8,7 +8,7 @@ struct config_data_t {
     std::string input_file_name;
     std::string output_alphabet_order;
     std::string output_count_order;
-    int thread_num;
+    size_t thread_num;
 };
 
 

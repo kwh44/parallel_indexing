@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 project(parallel_indexing)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 find_package(Boost COMPONENTS locale REQUIRED)
 
@@ -12,7 +12,7 @@ find_package(LibArchive REQUIRED)
 
 find_package(ICU COMPONENTS uc i18n REQUIRED)
 
-# add_compile_options("-DDEBUG")
+add_compile_options("-DDEBUG")
 
 set(Boost_USE_STATIC_LIBS OFF)
 
@@ -21,6 +21,7 @@ set(Boost_USE_MULTITHREAD ON)
 include_directories(include)
 
 add_executable(parallel_indexing main.cpp include/read_config.hpp src/read_config.cpp
-        include/measure_time.hpp src/read_from_file.cpp include/read_from_file.hpp)
+        include/measure_time.hpp src/read_from_file.cpp include/read_from_file.hpp
+        include/boundary_analysis.h src/boundary_analysis.cpp)
 
-target_link_libraries(parallel_indexing Boost::locale archive)
+target_link_libraries(parallel_indexing Boost::locale archive Threads::Threads)

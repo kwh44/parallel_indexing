@@ -1,7 +1,16 @@
 #include <iostream>
+#include <thread>
+#include <string>
+#include <algorithm>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <numeric>
 #include "read_config.hpp"
 #include "measure_time.hpp"
 #include "read_from_file.hpp"
+#include "boundary_analysis.h"
+
 
 int main(int argc, char **argv) {
     // help info
@@ -36,8 +45,52 @@ int main(int argc, char **argv) {
 #endif
     std::vector<std::string> file_data;
     get_file_content(file_data, conf_data.input_file_name);
-    for (const auto& v: file_data) {
+    std::cout << "return from get_file_content\n";
+    for (const auto &v: file_data) {
         std::cout << v << std::endl;
     }
+
+    std::vector<std::thread> thread_list;
+    thread_list.reserve(conf_data.thread_num);
+    std::vector<std::unique_ptr<std::map<std::string, size_t>>> list;
+    std::mutex list_mtx;
+
+    for (size_t i = 0; i < conf_data.thread_num; ++i) {
+        thread_list.emplace_back(parse, std::ref(list), i, conf_data.thread_num, std::ref(file_data),
+                                 std::ref(list_mtx));
+    }
+    std::cout << "everything created\n";
+
+    for (auto &v: thread_list) v.join();
+
+    for (auto &v: list) {
+        for (auto &v: *v) {
+            std::cout << v.first << " : " << v.second <<  std::endl;
+        }
+    }
     return 0;
+}
+
+void worker_reduce_map(std::vector<std::unique_ptr<std::map<std::string, size_t>>> &list, int start, int step) {
+    // merge maps in one
+    // for each map in range (auto i = list.begin() + start; i < list.end(); i += step)
+    // std::accumulate(list->begin() + 1, list->end(), list->begin(), reduce_callable);
+}
+
+
+void
+reduce_callable(std::unique_ptr<std::map<std::string, size_t>> &a, std::unique_ptr<std::map<std::string, size_t>> &b) {
+    /*
+    std::for_each(a->begin(), a->end(), [&b](std::map<std::string, size_t>::iterator x) {
+                                                auto result = b->find(x->first);
+                                                if (result != b->end()) x->second += result->second;});
+    */
+    auto left_map_ptr = a.get();
+    auto right_map_ptr = b.get();
+    for (auto i = left_map_ptr->begin(); i != left_map_ptr->end(); ++i) {
+        auto result = right_map_ptr->find(i->first);
+        if (result != right_map_ptr->end()) {
+            i->second += result->second;
+        }
+    }
 }
