@@ -12,7 +12,7 @@ find_package(LibArchive REQUIRED)
 
 find_package(ICU COMPONENTS uc i18n REQUIRED)
 
-add_compile_options("-DDEBUG")
+# add_compile_options("-DDEBUG")
 
 set(Boost_USE_STATIC_LIBS OFF)
 
@@ -22,6 +22,7 @@ include_directories(include)
 
 add_executable(parallel_indexing main.cpp include/read_config.hpp src/read_config.cpp
         include/measure_time.hpp src/read_from_file.cpp include/read_from_file.hpp
-        include/boundary_analysis.h src/boundary_analysis.cpp)
+        include/boundary_analysis.hpp src/boundary_analysis.cpp include/read_txt_to_string.hpp
+        src/read_txt_to_string.cpp)
 
 target_link_libraries(parallel_indexing Boost::locale archive Threads::Threads)

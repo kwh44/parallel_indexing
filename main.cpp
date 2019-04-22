@@ -10,7 +10,7 @@
 #include "read_config.hpp"
 #include "measure_time.hpp"
 #include "read_from_file.hpp"
-#include "boundary_analysis.h"
+#include "boundary_analysis.hpp"
 
 typedef std::pair<std::string, size_t> pair;
 
@@ -62,11 +62,11 @@ int main(int argc, char **argv) {
     std::vector<std::string> file_data;
     get_file_content(file_data, conf_data.input_file_name);
     auto finish_reading = get_current_time_fenced();
-
+#ifdef DEBUG
     for (const auto &v: file_data) {
         std::cout << v << std::endl;
     }
-
+#endif
     std::vector<std::thread> thread_list;
     thread_list.reserve(conf_data.thread_num);
     std::vector<std::unique_ptr<std::map<std::string, size_t>>> list;
@@ -103,7 +103,6 @@ int main(int argc, char **argv) {
     for (auto &v: sort_container) {
         output_alphabet << v.first << ": " << v.second << std::endl;
     }
-    std::cout << sort_container.size() << std::endl;
     // sort by usage count
     std::sort(sort_container.begin(), sort_container.end(),
               [](const pair &l, const pair &r) {

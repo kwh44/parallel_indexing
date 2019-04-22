@@ -6,7 +6,7 @@
 #include <boost/locale/boundary.hpp>
 #include <algorithm>
 #include <set>
-#include "boundary_analysis.h"
+#include "boundary_analysis.hpp"
 
 
 static int count(const std::string &str, const std::string &sub) {
