@@ -4,7 +4,7 @@
 Indexes words from input data filename by alphabetical and usage count order.<br/>
 Command line input: config_filename, which has:<br/>
     <ul>
-        <li>input data filename (supports zip and txt format)</li>
+        <li>input data filename (supports txt, zip, tar, gz, ar, etc.)</li>
         <li>output filename by alphabet</li>
         <li>output filename by count (from most occuring word to least one)</li>
         <li>number of threads to utilize</li>
@@ -15,6 +15,7 @@ Command line input: config_filename, which has:<br/>
     <li>Boost.Locale >= 1.68.0</li>
     <li>ICU >= 62.1</li>
     <li>libarchive >= 3.3.3</li>
+    <li>Compiler supporting C++17 standard</li> 
 </ul>
 <h4>How to build&run</h4>
 <ul>

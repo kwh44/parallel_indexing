@@ -4,6 +4,8 @@ project(parallel_indexing)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_BUILD_TYPE Release)
+
 find_package(Boost COMPONENTS locale REQUIRED)
 
 find_package(Threads REQUIRED)
