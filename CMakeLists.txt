@@ -23,6 +23,6 @@ include_directories(include)
 add_executable(parallel_indexing main.cpp include/read_config.hpp src/read_config.cpp
         include/measure_time.hpp src/read_from_file.cpp include/read_from_file.hpp
         include/boundary_analysis.hpp src/boundary_analysis.cpp include/read_txt_to_string.hpp
-        src/read_txt_to_string.cpp)
+        src/read_txt_to_string.cpp include/count_token_usage.hpp src/count_token_usage.cpp)
 
 target_link_libraries(parallel_indexing Boost::locale archive Threads::Threads)

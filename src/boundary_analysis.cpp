@@ -2,38 +2,18 @@
 // Created by kwh44 on 4/20/19.
 //
 
+#include <set>
 #include <boost/locale.hpp>
 #include <boost/locale/boundary.hpp>
-#include <algorithm>
-#include <set>
 #include "boundary_analysis.hpp"
 
-
-static int count(const std::string &str, const std::string &sub) {
-    if (sub.length() == 0) return 0;
-    int count = 0;
-    for (size_t offset = str.find(sub); offset != std::string::npos;
-         offset = str.find(sub, offset + sub.length())) {
-        ++count;
-    }
-    return count;
-}
-
-void parse(std::vector<std::unique_ptr<std::map<std::string, size_t>>> &list, size_t start, size_t step,
-           std::vector<std::string> &data, std::mutex &list_mtx) {
-    auto tls_map = std::make_unique<std::map<std::string, size_t> >();
-#ifdef DEBUG
-    std::cout << "tls map created" << std::endl;
-#endif
-    for (size_t i = start; i < data.size(); i+= step) {
-        boost::locale::boundary::ssegment_index map(boost::locale::boundary::word, data[i].begin(), data[i].end());
+void parse(std::vector<std::string> &data, std::vector<std::string> &tokens_list) {
+    std::set<std::string> tokens_set;
+    for (const auto &v: data) {
+        boost::locale::boundary::ssegment_index map(boost::locale::boundary::word, v.begin(), v.end());
         map.rule(boost::locale::boundary::word_any);
-        std::set<std::string> s(map.begin(), map.end());
-        for (auto &v: s) {
-            tls_map->insert_or_assign(v, (*tls_map)[v] + count(data[i], v));
-        }
+        tokens_set.insert(map.begin(), map.end());
     }
-    list_mtx.lock();
-    list.emplace_back(std::move(tls_map));
-    list_mtx.unlock();
+    tokens_list.reserve(tokens_set.size());
+    std::copy(tokens_set.begin(), tokens_set.end(), std::back_inserter(tokens_list));
 }

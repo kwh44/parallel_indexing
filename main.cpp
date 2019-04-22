@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <set>
 #include <memory>
 #include <mutex>
 #include <numeric>
@@ -11,6 +12,7 @@
 #include "measure_time.hpp"
 #include "read_from_file.hpp"
 #include "boundary_analysis.hpp"
+#include "count_token_usage.hpp"
 
 typedef std::pair<std::string, size_t> pair;
 
@@ -71,10 +73,19 @@ int main(int argc, char **argv) {
     thread_list.reserve(conf_data.thread_num);
     std::vector<std::unique_ptr<std::map<std::string, size_t>>> list;
     std::mutex list_mtx;
+
     auto start_counting = get_current_time_fenced();
+    // create set with tokens from input text file(s)
+    std::vector<std::string> tokens_list;
+    parse(file_data, tokens_list);
+#ifdef DEBUG
+    for (const auto & v: tokens_list) {
+        std::cout << v << std::endl;
+    }
+#endif
     for (size_t i = 0; i < conf_data.thread_num; ++i) {
-        thread_list.emplace_back(parse, std::ref(list), i, conf_data.thread_num, std::ref(file_data),
-                                 std::ref(list_mtx));
+        thread_list.emplace_back(token_usage,std::ref(file_data), std::ref(tokens_list), std::ref(list),
+                i, conf_data.thread_num, std::ref(list_mtx));
     }
     for (auto &v: thread_list) v.join();
     auto finish_counting = get_current_time_fenced();
@@ -116,5 +127,6 @@ int main(int argc, char **argv) {
     std::cout << "Total time: " << to_us(total_finish - start_reading) / 1000000.0 << std::endl;
     std::cout << "Reading time: " << to_us(finish_reading - start_reading) / 1000000.0 << std::endl;
     std::cout << "Counting time: " << to_us(finish_counting - start_counting) / 1000000.0 << std::endl;
+
     return 0;
 }
